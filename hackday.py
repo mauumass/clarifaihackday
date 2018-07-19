@@ -60,7 +60,7 @@ def getUberEstimate(start_coord, end_coord):
         
     uber_estimates = response.json.get('prices')
     uber_pool = uber_estimates[0]
-    uber_x = uber_estimates[0]
+    uber_x = uber_estimates[1]
     
     return uber_pool, uber_x
 
