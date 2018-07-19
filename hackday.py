@@ -10,16 +10,32 @@ from uber_rides.session import Session
 from uber_rides.client import UberRidesClient
 from flask import Flask
 from flask_restful import Resource, Api
+from uber_rides.auth import AuthorizationCodeGrant
 
 google_api_key = 'AIzaSyCD1cJUYVkuzr6xDqz4fOpfIpA_rLwWUg0'
 session = Session(server_token='pRiNDj8r51vfn7M4i770hMkU24WnCF4E_v2i0-nk')
+
 uber_client = UberRidesClient(session)
+uber_private_id = 'b8e5c464-5de2-4539-a35a-986d6e58f186' #uberx
+uber_shared_id = '929fcc19-8cb4-4007-a54f-3ab34473700f'
+auth_flow = AuthorizationCodeGrant(
+    'qvPuHmZwryNcDLzLC4rGDgN8C9mtnVDu',
+    'request',
+    'cSoR_fTMRfDxB3nxwU_LuTmCBWboXpWWgNqOQaPe',
+    'http://127.0.0.1:5000',
+)
+uber_fare = ()
+redirect_url = 'https://localhost/?code=crd.EA.CAESEGNRwzhBj0a_k-zEkTpnaAUiATE.Kl4gr0rnw5JE1xW8x-jgLNpu-ErHGIYZo0uyoVhtGqk#_'
+
 app = Flask(__name__)
 api = Api(app)
+last_request_coords = ()
 
 class GetEstimates(Resource):
     def get(self, start, end):
+        global last_request_coords
         start_coord, end_coord = getGoogleCoordinates(start, end)  
+        last_request_coords = (start_coord, end_coord)
         #Make the uber request
         uber_pool, uber_x = getUberEstimate(start_coord, end_coord)     
         #Make the lyft request
@@ -36,6 +52,47 @@ api.add_resource(GetEstimates, '/getestimates/<string:start>/<string:end>')
 #        return start_coord, end_coord
 #    
 #api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
+
+class PlaceOrder(Resource):
+    def get(self, company, ride_type):
+        #if company.lower() == 'lyft':
+            
+        if company.lower() == 'uber':
+            session = auth_flow.get_session(redirect_url)
+            auth_uber_client = UberRidesClient(session)
+            credentials = session.oauth2credential
+            
+            product_id = ''
+            if ride_type == 'private':
+                product_id = uber_private_id
+            else:
+                product_id = uber_shared_id
+            
+            estimate = auth_uber_client.estimate_ride(
+                product_id=product_id,
+                start_latitude=last_request_coords[0]['lat'],
+                start_longitude=last_request_coords[0]['lng'],
+                end_latitude=last_request_coords[1]['lat'],
+                end_longitude=-last_request_coords[1]['lng'],
+                seat_count=2
+            )
+            fare = estimate.json.get('fare')
+            print(fare['fare_id'])
+                
+            response = auth_uber_client.request_ride(
+                product_id=product_id,
+                start_latitude=last_request_coords[0]['lat'],
+                start_longitude=last_request_coords[0]['lng'],
+                end_latitude=last_request_coords[1]['lat'],
+                end_longitude=-last_request_coords[1]['lng'],
+                seat_count=2,
+                fare_id=fare['fare_id'],
+                state=''
+            )
+            
+            return response
+        
+api.add_resource(PlaceOrder, '/placeorder/<string:company>/<string:ride_type>')                
 
 # Get coordinates
 def getGoogleCoordinates(start, end):
