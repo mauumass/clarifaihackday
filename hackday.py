@@ -37,8 +37,6 @@ class GetCoordinates(Resource):
     
 api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
 
-class PlaceOrder(Reso)
-
 # Get coordinates
 def getGoogleCoordinates(start, end):
     start_resp = requests.get('https://maps.googleapis.com/maps/api/geocode/json?address='+start+'&key='+google_api_key)
