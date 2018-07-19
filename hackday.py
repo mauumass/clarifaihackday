@@ -41,17 +41,17 @@ class GetEstimates(Resource):
         #Make the lyft request
         lyft_line, lyft_ = getLyftEstimate(start_coord, end_coord)
         
-        return start_coord, end_coord,uber_pool, uber_x, lyft_line, lyft_
+        return uber_pool, uber_x, lyft_line, lyft_
 
 api.add_resource(GetEstimates, '/getestimates/<string:start>/<string:end>')
 
-#class GetCoordinates(Resource):
-#    def get(self, start, end):
-#        start_coord, end_coord = getGoogleCoordinates(start, end)  
-#
-#        return start_coord, end_coord
-#    
-#api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
+class GetCoordinates(Resource):
+    def get(self, start, end):
+        startlatlng, endlatlng = getGoogleCoordinates(start, end)  
+
+        return [startlatlng, endlatlng]
+   
+api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
 
 class PlaceOrder(Resource):
     def get(self, company, ride_type):
