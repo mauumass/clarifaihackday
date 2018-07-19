@@ -25,17 +25,17 @@ class GetEstimates(Resource):
         #Make the lyft request
         lyft_line, lyft_ = getLyftEstimate(start_coord, end_coord)
         
-        return uber_pool, uber_x, lyft_line, lyft_
+        return start_coord, end_coord,uber_pool, uber_x, lyft_line, lyft_
 
 api.add_resource(GetEstimates, '/getestimates/<string:start>/<string:end>')
 
-class GetCoordinates(Resource):
-    def get(self, start, end):
-        start_coord, end_coord = getGoogleCoordinates(start, end)  
-        
-        return start_coord, end_coord
-    
-api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
+#class GetCoordinates(Resource):
+#    def get(self, start, end):
+#        start_coord, end_coord = getGoogleCoordinates(start, end)  
+#
+#        return start_coord, end_coord
+#    
+#api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
 
 # Get coordinates
 def getGoogleCoordinates(start, end):
@@ -71,8 +71,8 @@ def getLyftEstimate(start_coord, end_coord):
                                      headers = {'Authorization': 'bearer j3aL7xIFYTyWMTl1i2qaiyGdfaGxcyGQRHXthANJdqbUNXfBilOqmlHvNvm'
                                                 +'OxVgb3DdwsrKktjeKWv5jdzevdjEMd+plS71xwy91iNhSQ+XmtXlXqY+22UA='})        
     lyft_estimates = json.loads(lyft_est_resp.text)['cost_estimates']
-    lyft_line = lyft_estimates[1]
-    lyft_ = lyft_estimates[2]
+    lyft_line = lyft_estimates[0]
+    lyft_ = lyft_estimates[1]
     
     return lyft_line, lyft_  
     
