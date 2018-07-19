@@ -8,10 +8,26 @@ import requests
 import json
 from uber_rides.session import Session
 from uber_rides.client import UberRidesClient
+from flask import Flask
+from flask_restful import Resource, Api
 
 google_api_key = 'AIzaSyCD1cJUYVkuzr6xDqz4fOpfIpA_rLwWUg0'
 session = Session(server_token='pRiNDj8r51vfn7M4i770hMkU24WnCF4E_v2i0-nk')
 uber_client = UberRidesClient(session)
+app = Flask(__name__)
+api = Api(app)
+
+class GetEstimates(Resource):
+    def get(self, start, end):
+        start_coord, end_coord = getGoogleCoordinates(start, end)  
+        #Make the uber request
+        uber_pool, uber_x = getUberEstimate(start_coord, end_coord)     
+        #Make the lyft request
+        lyft_line, lyft_ = getLyftEstimate(start_coord, end_coord)
+        
+        return uber_pool, uber_x, lyft_line, lyft_
+
+api.add_resource(GetEstimates, '/getestimates/<string:start>/<string:end>')
 
 # Get coordinates
 def getGoogleCoordinates(start, end):
@@ -53,19 +69,20 @@ def getLyftEstimate(start_coord, end_coord):
     return lyft_line, lyft_  
     
 if __name__ == '__main__':
-    while(True):
-        #Start google map coordinates request
-        start = raw_input('Enter starting location... ').replace(' ', '+')
-        end = raw_input('Enter destination... ').replace(' ', '+')
-        
-        start_coord, end_coord = getGoogleCoordinates(start, end)
-        
-        #Make the uber request
-        uber_pool, uber_x = getUberEstimate(start_coord, end_coord)
-        
-        #Make the lyft request
-        lyft_line, lyft_ = getLyftEstimate(start_coord, end_coord)
-        
+#    while(True):
+#        #Start google map coordinates request
+#        start = raw_input('Enter starting location... ').replace(' ', '+')
+#        end = raw_input('Enter destination... ').replace(' ', '+')
+#        
+#        start_coord, end_coord = getGoogleCoordinates(start, end)
+#        
+#        #Make the uber request
+#        uber_pool, uber_x = getUberEstimate(start_coord, end_coord)
+#        
+#        #Make the lyft request
+#        lyft_line, lyft_ = getLyftEstimate(start_coord, end_coord)   
+    
+    app.run(debug=True)
         
         
         
