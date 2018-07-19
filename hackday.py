@@ -29,6 +29,16 @@ class GetEstimates(Resource):
 
 api.add_resource(GetEstimates, '/getestimates/<string:start>/<string:end>')
 
+class GetCoordinates(Resource):
+    def get(self, start, end):
+        start_coord, end_coord = getGoogleCoordinates(start, end)  
+        
+        return start_coord, end_coord
+    
+api.add_resource(GetCoordinates, '/getcoordinates/<string:start>/<string:end>')
+
+class PlaceOrder(Reso)
+
 # Get coordinates
 def getGoogleCoordinates(start, end):
     start_resp = requests.get('https://maps.googleapis.com/maps/api/geocode/json?address='+start+'&key='+google_api_key)
