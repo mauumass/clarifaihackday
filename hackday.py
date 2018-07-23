@@ -12,20 +12,20 @@ from flask import Flask
 from flask_restful import Resource, Api
 from uber_rides.auth import AuthorizationCodeGrant
 
-google_api_key = 'AIzaSyCD1cJUYVkuzr6xDqz4fOpfIpA_rLwWUg0'
-session = Session(server_token='pRiNDj8r51vfn7M4i770hMkU24WnCF4E_v2i0-nk')
+google_api_key = 'REPLACE'
+session = Session(server_token='REPLACE')
 
 uber_client = UberRidesClient(session)
 uber_private_id = 'b8e5c464-5de2-4539-a35a-986d6e58f186' #uberx
 uber_shared_id = '929fcc19-8cb4-4007-a54f-3ab34473700f'
 auth_flow = AuthorizationCodeGrant(
-    'qvPuHmZwryNcDLzLC4rGDgN8C9mtnVDu',
+    'REPLACE',
     'request',
-    'cSoR_fTMRfDxB3nxwU_LuTmCBWboXpWWgNqOQaPe',
+    'REPLACE',
     'http://127.0.0.1:5000',
 )
 uber_fare = ()
-redirect_url = 'https://localhost/?code=crd.EA.CAESEGNRwzhBj0a_k-zEkTpnaAUiATE.Kl4gr0rnw5JE1xW8x-jgLNpu-ErHGIYZo0uyoVhtGqk#_'
+redirect_url = 'REPLACE'
 
 app = Flask(__name__)
 api = Api(app)
